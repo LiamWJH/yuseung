@@ -46,6 +46,7 @@ fn main() -> Result<(), std::io::Error> {
                 },
 
                 KeyEvent { code: KeyCode::Char(c), .. } => {text.push(c)},
+                KeyEvent { code: KeyCode::Enter, .. } => {text.push('\n')},
                 KeyEvent { code: KeyCode::Tab, .. } => {
                     for _ in 0..4 {
                         text.push(' ');
@@ -56,7 +57,7 @@ fn main() -> Result<(), std::io::Error> {
                 _ => {}
             }
         }
-        
+
         curr_content = UI::return_UI(&text, term_width);
         efficiet_render(&pre_content, &curr_content)?;
         pre_content = curr_content.clone();
