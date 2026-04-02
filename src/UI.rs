@@ -1,22 +1,34 @@
 pub fn return_UI(code_text: &str, term_width: u16) -> String {
-    let br = "=".repeat(term_width as usize) + "\n";
+    let br = "═".repeat(term_width as usize) + "\n";
     let title = box_UI("YUSEUNG", term_width, 1);
+    let random_test_shit = "";
 
     format!(
-"{title}\n{br}
+"{title}
 {code_text}"
     ).to_owned()
 }
 
+pub fn progressbar_UI(total_width: u16, progression: usize) -> String {
+    let width = total_width as usize;
+    let char_n = (progression * width) / 100;
+    let remaining = width.saturating_sub(char_n);
+    box_UI(
+        &format!("{}{}", "█".repeat(char_n), " ".repeat(remaining)),
+        total_width,
+        3
+    )
+}
+
 pub fn box_UI(content: &str, width: u16, height: u16) -> String {
-    let top_x_bar = format!("┌{}┐", "─".repeat(width as usize - 2));
-    let bottom_x_bar = format!("└{}┘", "─".repeat(width as usize - 2));
+    let top_x_bar = format!("┏{}┓", "━".repeat(width as usize - 2));
+    let bottom_x_bar = format!("┗{}┛", "━".repeat(width as usize - 2));
 
     let x_padding_total = (width as usize - 2).saturating_sub(content.len());
     let x_pad_left = x_padding_total / 2;
     let x_pad_right = x_padding_total - x_pad_left;
 
-    let middle = format!("│{}{}{}│",
+    let middle = format!("┃{}{}{}┃",
         " ".repeat(x_pad_left),
         content,
         " ".repeat(x_pad_right)
