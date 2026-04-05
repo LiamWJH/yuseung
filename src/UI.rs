@@ -99,3 +99,8 @@ pub fn italic_text(content: &str) -> String {
 pub fn underline_text(content: &str) -> String {
     format!("\x1b[4m{}\x1b[24m", content)
 }
+
+pub fn highlight_bg_text(content: &str, term_width: u16) -> String {
+    let padded = format!("{:<width$}", content, width = term_width as usize);
+    format!("\x1b[48;2;50;50;150m{padded}\x1b[0m")
+}
