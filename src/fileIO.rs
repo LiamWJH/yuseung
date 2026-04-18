@@ -7,39 +7,36 @@ pub enum FileOrDir {
         name: String,
         path: PathBuf,
         content: String,
-        parent: Box<FileOrDir>,
     },
     Folder {
         name: String,
         path: PathBuf,
         children: Vec<FileOrDir>,
-        parent: Box<FileOrDir>
     },
 }
 
 pub fn open_folder(path: &str) -> io::Result<Vec<FileOrDir>> {
     let mut result = Vec::new();
-
     for entry in fs::read_dir(path)? {
         let entry = entry?;
         let name = entry.file_name().to_string_lossy().to_string();
         let meta = entry.metadata()?;
+        let path = entry.path();
 
         if meta.is_dir() {
             result.push(FileOrDir::Folder {
                 name,
-                children: open_folder(entry.path().to_str().unwrap())?,
-                parent: todo!(),
+                children: open_folder(path.to_str().unwrap())?,
+                path,
             });
         } else {
             result.push(FileOrDir::File {
                 name,
-                content: fs::read_to_string(entry.path())?,
-                parent: todo!(),
+                content: fs::read_to_string(&path)?,
+                path,
             });
         }
     }
-
     Ok(result)
 }
 
@@ -47,6 +44,18 @@ pub fn get_content(file: &FileOrDir) -> Option<&str> {
     match file {
         FileOrDir::File { content, .. } => Some(content),
         FileOrDir::Folder { .. } => None,
+    }
+}
+
+pub fn find_file<'a>(folder: &'a FileOrDir, target: &str) -> Option<&'a FileOrDir> {
+    match folder {
+        FileOrDir::Folder { children, .. } => {
+            children.iter().find(|child| match child {
+                FileOrDir::File { name, .. } => name == target,
+                FileOrDir::Folder { name, .. } => name == target,
+            })
+        }
+        FileOrDir::File { .. } => None,
     }
 }
 

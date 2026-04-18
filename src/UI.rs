@@ -1,4 +1,7 @@
-pub fn return_UI(code_text: &str, term_width: u16) -> String {
+use crate::fileIO::FileOrDir;
+
+
+pub fn codespace_UI(code_text: &str, term_width: u16) -> String {
     let br = "═".repeat(term_width as usize) + "\n";
     let title = box_UI("YUSEUNG", term_width, 1);
     let random_test_shit = "";
@@ -7,6 +10,19 @@ pub fn return_UI(code_text: &str, term_width: u16) -> String {
 "{title}
 {code_text}"
     ).to_owned()
+}
+
+pub fn explorer_UI(path: &str, term_width: u16, entries: Vec<FileOrDir>) -> String {
+    let path_box = box_UI(path, term_width, 1);
+
+    let entries_list = entries.iter().map(|entry| {
+        match entry {
+            FileOrDir::File { name, .. } => format!("  📄 {name}"),
+            FileOrDir::Folder { name, .. } => format!("  📁 {name}"),
+        }
+    }).collect::<Vec<String>>().join("\n");
+
+    format!("{path_box}\n{entries_list}")
 }
 
 pub fn progressbar_UI(total_width: u16, progression: usize) -> String {
